@@ -1,0 +1,69 @@
+# PartCAD package: SnapMagic Search (formerly SnapEDA) 3D models as parts.
+#
+# Published as //pub/collection/snapmagic, with the other collections of
+# models. Its one external dependency 'models' is served by the snapmagic_repo
+# plugin: a manufacturer's part, by its part number and manufacturer
+# ('<MPN>~<manufacturer>'), with SnapMagic's STEP model of it. Nothing is
+# listed - a part is asked for by name, and found with 'pc search parts'. See
+# the README.
+name: //pub/collection/snapmagic
+
+desc: |
+  SnapMagic Search (formerly SnapEDA) 3D models of manufacturers' parts, as
+  PartCAD parts: a part per manufacturer's part number, named
+  '<MPN>~<manufacturer>' since two manufacturers can share a part number, with
+  SnapMagic's STEP model of it, and the manufacturer and part number as its
+  vendor and SKU, so that a store quoting by them - DigiKey's, Octopart's -
+  prices it. Nothing is listed; search instead. Downloading takes a SnapMagic
+  account of your own. No geometry is vendored: every model is fetched from
+  SnapMagic when it is first built.
+url: https://www.snapeda.com
+
+# The first PartCAD that gives a repository plugin its key taken apart
+# ('request["query"]') and the toolkit 'plugin_models' this builds on.
+partcad: ">=0.9.17"
+
+# A model of a part sold by its manufacturer, not something to manufacture.
+manufacturable: false
+
+docs:
+  name: SnapMagic for PartCAD
+  usage: |
+    ```shell
+    pc login //pub/collection/snapmagic:snapmagic_repo
+    pc search parts -P //pub/collection/snapmagic/models -k LM358DR
+    pc info //pub/collection/snapmagic/models:LM358DR~texas-instruments
+    ```
+
+dependencies:
+  models:
+    type: external
+    plugin: :snapmagic_repo
+    desc: SnapMagic's 3D models of manufacturers' parts, by part number and manufacturer.
+
+repositories:
+  snapmagic_repo:
+    type: basic
+    path: snapmagic_repo.py
+    desc: Serves SnapMagic's 3D models of manufacturers' parts, by part number and manufacturer, and searches SnapMagic.
+    # Yours to change without touching this package, in ~/.partcad/config.yaml,
+    # by the plugin's name - which is also where 'pc login' keeps the token:
+    #
+    #   parameters:
+    #     //pub/collection/snapmagic:snapmagic_repo:
+    #       token: ...
+    parameters:
+      token:
+        type: string
+        default: ""
+        desc: >-
+          The token of your SnapMagic (snapeda.com) account. 'pc login
+          //pub/collection/snapmagic:snapmagic_repo' gets it with your user
+          name and password, which it does not keep; or SNAPMAGIC_TOKEN. Never
+          set it in a package.
+      api:
+        type: string
+        default: ""
+        desc: >-
+          Another address for SnapMagic: a server standing in for it, to test
+          against. Empty is snapeda.com.
